@@ -5,33 +5,56 @@ import crypten.communicator as comm
 import torch
 
 class BitonicSort:
-	def __init__(self, a):
+	def __init__(self, a, firstPriority, secondPriority, dir1, dir2):
 		self.a = a
 		self.n = len(a)
+		self.firstPriority = firstPriority
+		self.secondPriority = secondPriority
+		self.dir1 = dir1
+		self.dir2 = dir2
 
+
+	def breakTie(self, i, j):
+		greaterThan = (self.dir2*self.a[i][self.secondPriority] > self.dir2*self.a[j][self.secondPriority])
+		
+		return greaterThan
 
 	def compAndSwap(self, i, j, dire):
-		greaterThan = (self.a[i] > self.a[j])
+		greaterThan = (self.dir1*self.a[i][self.firstPriority]> self.dir1*self.a[j][self.firstPriority])
+		lessThan = (self.dir1*self.a[i][self.firstPriority] < self.dir1*self.a[j][self.firstPriority])
 
-		boolVal = greaterThan.get_plain_text()
+		boolValGT = greaterThan.get_plain_text()
+		boolValLT = lessThan.get_plain_text()
 
-		if (dire == 1 and boolVal) or (dire == 0 and not boolVal):
+		res = False
+
+		if not boolValGT and not boolValLT:
+			res = self.breakTie(i, j).get_plain_text()
+		else:
+			res = boolValGT
+
+		if (dire == 1 and res) or (dire == 0 and not res):
 
 			te = self.a.share[i]
+			print(te)
 			te1 = self.a.share[j]
 
-			newShare = []
+			newShare = torch.zeros([len(self.a), 4], dtype=torch.long)
 			b = self.a.share
 
 			for k in range(0, len(b)):
 				if k == i:
-					newShare.append(te1)
+					newShare[k] = te1
 				elif k == j:
-					newShare.append(te)
+					newShare[j] = te
 				else:
-					newShare.append(b[k])
-		
-			self.a.share = torch.tensor(newShare)
+					newShare[k] = b[k]
+
+			rank = comm.get().get_rank()
+			if rank == 0:
+				print("here", newShare)
+				print("here1", self.a.share)
+			self.a.share = newShare
 
 
 	def bitonicMerge(self, low, cnt, dire):
