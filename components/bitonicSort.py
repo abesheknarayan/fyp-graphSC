@@ -36,7 +36,6 @@ class BitonicSort:
 		if (dire == 1 and res) or (dire == 0 and not res):
 
 			te = self.a.share[i]
-			print(te)
 			te1 = self.a.share[j]
 
 			newShare = torch.zeros([len(self.a), 4], dtype=torch.long)
@@ -51,9 +50,7 @@ class BitonicSort:
 					newShare[k] = b[k]
 
 			rank = comm.get().get_rank()
-			if rank == 0:
-				print("here", newShare)
-				print("here1", self.a.share)
+		
 			self.a.share = newShare
 
 

@@ -2,8 +2,10 @@ from ctypes import addressof
 import crypten
 import crypten.mpc as mpc
 import crypten.communicator as comm
+from numpy import source
 import torch
 import bitonicSort
+import scatterAndGather
 
 
 class EdgeListEncodedGraph:
@@ -26,5 +28,16 @@ class EdgeListEncodedGraph:
     def destinationSort(self):
         sortObject = bitonicSort.BitonicSort(self.graphList, 1, 2, 1, 1)
         sortObject.startSort()
+
+    def performScatter(self):
+        self.sourceSort()
+        scatterGatherObject = scatterAndGather.ScatterAndGather(self.M)
+        scatterGatherObject.scatterAcrossEdges(self.graphList)
+    
+    def performGather(self):
+        self.destinationSort()
+        scatterGatherObject = scatterAndGather.ScatterAndGather(self.M)
+        scatterGatherObject.gatherFromEdges(self.graphList)
+
         
 
