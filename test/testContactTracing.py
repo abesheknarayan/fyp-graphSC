@@ -9,7 +9,10 @@ import sys
 sys.path.insert(0, '../components')
 
 import bitonicSort
+import scatterAndGatherContactTracing
+import graphStructure
 int_infinity = 100000000  
+
 
 #Initialise Crypten
 crypten.init()
@@ -33,7 +36,7 @@ def nextPowerOf2(n):
 
 
 @mpc.run_multiprocess(world_size=2)
-def testBitonicSort():
+def testScatterAndGatherContactTracing():
 
     arr_used = [[1, 1, 1, 0, 0, 0, 1/4, 1, 0, 0], [2, 2, 1, 0, 3, 0, 1/4, 2, 0, 0], [3, 3, 1, 0, 0, 0, 1/4, 3, 0, 0], [4, 4, 1, 0, 0, 0, 1/4, 2, 0, 0], [1, 3, 0, 0, 0, 0, 0, 0, 0, 0], [3, 1, 0, 0, 0, 0, 0, 0, 0, 0], [3, 4, 0, 0, 1, 0, 0, 0, 0, 0], [4, 3, 0, 0, 1, 0, 0, 0, 0, 0], [4, 2, 0, 0, 0, 0, 0, 0, 0, 0], [2, 4, 0, 0, 0, 0, 0, 0, 0, 0], [2, 3, 0, 0, 0, 0, 0, 0, 0, 0], [3, 2, 0, 0, 0, 0, 0, 0, 0, 0]]
 
@@ -43,15 +46,20 @@ def testBitonicSort():
         arr_used.append([int_infinity, int_infinity,int_infinity, int_infinity, int_infinity, int_infinity, int_infinity, int_infinity, int_infinity, int_infinity])
     a_enc = crypten.cryptensor(arr_used, ptype=crypten.mpc.arithmetic)
 
-    print(a_enc)
-    sortObject = bitonicSort.BitonicSort(a_enc, 0, 2, 1, -1)
-    
-    sortObject.startSort()
-    a = a_enc.get_plain_text() 
+    scatterAndGatherContactTracingObject = scatterAndGatherContactTracing.ScatterAndGatherContactTracing(len(arr_used))
+    graphStructureObject = graphStructure.EdgeListEncodedGraph(len(arr_used), a_enc, scatterAndGatherContactTracingObject)
+
+    L = 1
+
+    for i in range(0, L):
+        graphStructureObject.performScatter()
+        graphStructureObject.performGather()
 
     rank = comm.get().get_rank()
-   
+    afterGraph = graphStructureObject.graphList.get_plain_text()
     if rank == 0:
-        print(a)
+        print(afterGraph)
 
-testBitonicSort()
+   
+
+testScatterAndGatherContactTracing()
