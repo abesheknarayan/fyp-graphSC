@@ -54,10 +54,10 @@ def testScatterAndGatherContactTracing():
 
     a_enc = crypten.cryptensor(arr_used, ptype=crypten.mpc.arithmetic)
 
-    scatterAndGatherContactPageRankObject = scatterAndGatherPageRank.ScatterAndGatherPageRank(len(arr_used), 0.15)
+    scatterAndGatherContactPageRankObject = scatterAndGatherPageRank.ScatterAndGatherPageRank(len(arr_used), 0.15, 0)
     graphStructureObject = graphStructure.EdgeListEncodedGraph(len(arr_used), a_enc, scatterAndGatherContactPageRankObject)
 
-    L = 2
+    L = 1
 
     for i in range(0, L):
         graphStructureObject.performScatter()

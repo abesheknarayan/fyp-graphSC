@@ -7,12 +7,13 @@ import torch
 #Graph List structure (u, v, isVertex, data, covid risk, rho, residue, degree, dist, closenessCentrality)
 class ScatterAndGatherPageRank:
 
-    def __init__(self, M,  alpha):
+    def __init__(self, M,  alpha, type):
         self.M = M
         self.rho = []*M
         self.y = 1
         self.alpha = alpha
         self.oneMinusAlpha = 1
+        self.type = type
     
     def scatterAcrossEdges(self, graphList):
         
@@ -23,7 +24,16 @@ class ScatterAndGatherPageRank:
             #Get Yj+1/Yj
             weightToSubtract = self.oneMinusAlpha*self.alpha   
             term1 = (self.y - weightToSubtract)/self.y
-            term2 = graphList[i][6]/graphList[i][7]
+
+            degreeNotZero = (graphList[i][7] != 0)
+
+            if self.type == 0:
+                degreeNotZero = degreeNotZero.get_plain_text()
+            
+            term2 = 0
+
+            if degreeNotZero:
+                term2 = (graphList[i][6]/graphList[i][7])
 
             finalTerm = term1*term2
 

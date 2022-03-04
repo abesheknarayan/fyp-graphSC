@@ -7,5 +7,3 @@
 3 - Page rank accuracy vs Page Rank clear text accuracy
 
 4 - Closeness centrality times on graphs of sizes 10 to 1e6(1 iteration)
-
-5 - Closeness centrality accuracy vs Closeness centrality clear text
