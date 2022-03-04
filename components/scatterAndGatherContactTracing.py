@@ -4,7 +4,7 @@ import crypten.mpc as mpc
 import crypten.communicator as comm
 import torch
 
-class ScatterAndGather:
+class ScatterAndGatherContactTracing:
 
     def __init__(self, M):
         self.M = M
@@ -14,11 +14,10 @@ class ScatterAndGather:
         for i in range(0, self.M):
             isV = graphList[i][2]
 
-            valS = isV*graphList[i][3] + (1-isV)*valS
+            valS = isV*graphList[i][4] + (1-isV)*valS
             graphList[i][3] = isV*graphList[i][3] + (1-isV)*valS
-            # print(graphList.get_plain_text())
-            # print(i, graphList[i][3].get_plain_text())
-    
+        
+
     def gatherFromEdges(self, graphList):
         agg = 0
         for i in range(0, self.M):
@@ -36,14 +35,14 @@ class ScatterAndGather:
             #Check if aggreagate is more than 1
             checkAgg = (agg >= 1)
             #Check if aggreagate is more than 1 plus the vertex value
-            aggMoreValue = (agg >= graphList[i][3] + 1)
+            aggMoreValue = (agg >= graphList[i][4] + 1)
             #Condition to update vertex data
             updateVertex = checkAgg*isV*aggMoreValue
 
             #Getting value needed to update vertex
             valToSet = updateVertex*(agg - 1) 
 
-            graphList[i][3] = updateVertex*valToSet + (1 - updateVertex)*graphList[i][3]
+            graphList[i][4] = updateVertex*valToSet + (1 - updateVertex)*graphList[i][4]
     
     
 

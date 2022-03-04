@@ -5,15 +5,15 @@ import crypten.communicator as comm
 from numpy import source
 import torch
 import bitonicSort
-import scatterAndGather
 
-
+#Graph List structure (u, v, isVertex, data, covid risk, rho, residue, degree, )
 class EdgeListEncodedGraph:
 
     #M is the size of the graph
-    def __init__(self, M, graphList):
+    def __init__(self, M, graphList, scatterAndGatherObject):
         self.M = M
         self.graphList = graphList
+        self.scatterAndGatherObject = scatterAndGatherObject
 
     #Source Sort where after the sorting protocol, 
     #the edge list representation will have vertices followed 
@@ -31,13 +31,25 @@ class EdgeListEncodedGraph:
 
     def performScatter(self):
         self.sourceSort()
-        scatterGatherObject = scatterAndGather.ScatterAndGather(self.M)
-        scatterGatherObject.scatterAcrossEdges(self.graphList)
+        self.scatterAndGatherObject.scatterAcrossEdges(self.graphList)
     
     def performGather(self):
         self.destinationSort()
-        scatterGatherObject = scatterAndGather.ScatterAndGather(self.M)
-        scatterGatherObject.gatherFromEdges(self.graphList)
+        self.scatterAndGatherObject.gatherFromEdges(self.graphList)
+    
+    def updateClosenessCentrality(self, sourceVertex):
+        
+        #Update closeness centrality of source vertex in 2 steps.
+        #First get sum of all d(sV, v) for all v and number of vertices n
+        sd = 0
+        nv = 0
+        for i in range(0, len(self.graphList)):
+            if self.graphList[i][0] == self.graphList[i][1]:
+                sd = sd + self.graphList[i][8]
+                nv = nv + 1
 
+       
+        #Find n-1/d which is closeness centrality
+        self.graphList[i][9] = (nv-1)/sd
         
 

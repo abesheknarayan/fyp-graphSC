@@ -38,7 +38,7 @@ class BitonicSort:
 			te = self.a.share[i]
 			te1 = self.a.share[j]
 
-			newShare = torch.zeros([len(self.a), 4], dtype=torch.long)
+			newShare = torch.zeros([len(self.a), 10], dtype=torch.long)
 			b = self.a.share
 
 			for k in range(0, len(b)):
